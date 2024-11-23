@@ -1,4 +1,6 @@
 # MySQL-Driver
+[![](https://jitpack.io/v/MCmoderSD/MySQL-Driver.svg)](https://jitpack.io/#MCmoderSD/MySQL-Driver)
+
 
 ## Description
 A simple Java MySQL driver for connecting to a MySQL database.
@@ -6,18 +8,26 @@ A simple Java MySQL driver for connecting to a MySQL database.
 ## Usage
 
 ### Maven
+Make sure you have the JitPack repository added to your `pom.xml` file:
 ```xml
-<dependencies>
-    <dependency>
-        <groupId>de.MCmoderSD</groupId>
-        <artifactId>mysql</artifactId>
-        <version>1.0.0</version>
-    </dependency>
-</dependencies>
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+Add the dependency to your `pom.xml` file:
+```xml
+<dependency>
+    <groupId>com.github.MCmoderSD</groupId>
+    <artifactId>MySQL-Driver</artifactId>
+    <version>1.0.0</version>
+</dependency>
 ```
 
-## Usage Example
 
+## Usage Example
 ```java
 import de.MCmoderSD.mysql.Driver;
 
