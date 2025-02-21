@@ -1,40 +1,3 @@
-# JSQL-Driver
-[![](https://jitpack.io/v/MCmoderSD/JSQL-Driver.svg)](https://jitpack.io/#MCmoderSD/JSQL-Driver)
-
-
-## Description
-A simple Java SQL driver for connecting to a SQL databases. 
-
-## Supported Databases
-- [x] MariaDB
-- [ ] Microsoft SQL Server (not tested)
-- [x] MySQL
-- [x] PostgreSQL
-
-## Usage
-
-### Maven
-Make sure you have the JitPack repository added to your `pom.xml` file:
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-Add the dependency to your `pom.xml` file:
-```xml
-<dependency>
-    <groupId>com.github.MCmoderSD</groupId>
-    <artifactId>JSQL-Driver</artifactId>
-    <version>2.0.0</version>
-</dependency>
-```
-
-
-## Usage Example
-```java
 import de.MCmoderSD.sql.Driver;
 
 import java.sql.PreparedStatement;
@@ -85,4 +48,3 @@ public class Database extends Driver {
         System.out.println("Row Count: " + database.getRowCount());
     }
 }
-```
