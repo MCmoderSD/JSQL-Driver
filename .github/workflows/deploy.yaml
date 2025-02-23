@@ -19,6 +19,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4.6.0
@@ -103,6 +105,12 @@ jobs:
             fi
           fi
 
+      - name: Get latest existing release tag
+        run: |
+          TAG=$(git tag --sort=-creatordate | grep -v "${{ env.version }}" | head -n 1)
+          echo "tag=$TAG" >> $GITHUB_ENV
+          echo "Previous tag: $TAG"
+
       - name: Calculate Hashes
         run: |
           FILE=target/${{ env.artifact }}.jar
@@ -121,8 +129,7 @@ jobs:
           tag_name: ${{ env.version }}
           name: "${{ env.repository}} - Release ${{ env.version }}"
           body: |
-            **Full Changelog**: https://github.com/MCmoderSD/${{ env.repository}}/commits/${{ env.version }}
-
+            **Full Changelog**: https://github.com/MCmoderSD/${{ env.repository }}/compare/${{ env.tag }}...${{ env.version }}
 
             ## Checksums:
 

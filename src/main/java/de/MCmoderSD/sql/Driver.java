@@ -101,11 +101,6 @@ public abstract class Driver {
         }
     }
 
-    /**
-     * Establishes a connection to the database.
-     *
-     * @return {@code true} if connected successfully, otherwise {@code false}.
-     */
     public boolean connect() {
         try {
             if (isConnected()) return true;
@@ -155,11 +150,6 @@ public abstract class Driver {
         private final String urlPattern;
         private final String classPath;
 
-        /**
-         * Constructs a DatabaseType with a specific URL pattern.
-         *
-         * @param urlPattern The JDBC URL pattern.
-         */
         DatabaseType(String urlPattern, String classPath) {
 
             // Set attributes
@@ -168,9 +158,9 @@ public abstract class Driver {
 
             // Register driver
             try {
-                Class.forName(classPath);
+                registerDriver();
             } catch (ClassNotFoundException e) {
-                System.err.println(e.getMessage());
+                throw new RuntimeException(e);
             }
         }
 
@@ -183,16 +173,11 @@ public abstract class Driver {
          * @return The formatted JDBC URL.
          */
         public String getUrl(String host, int port, String database) {
-            return String.format(this.urlPattern, host, port, database);
+            return String.format(urlPattern, host, port, database);
         }
 
-        /**
-         * Registers the database driver.
-         *
-         * @throws ClassNotFoundException If the driver class is not found.
-         */
-        public void registerDriver() throws ClassNotFoundException {
-            Class.forName(classPath);
+        public Class registerDriver() throws ClassNotFoundException {
+            return Class.forName(classPath);
         }
     }
 }
