@@ -109,9 +109,10 @@ public abstract class Driver {
     public boolean connect() {
         try {
             if (isConnected()) return true;
+            databaseType.registerDriver();
             connection = DriverManager.getConnection(url, username, password);
             return connection != null && connection.isValid(0);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             System.err.println(e.getMessage());
             return false;
         }
@@ -146,19 +147,31 @@ public abstract class Driver {
     public enum DatabaseType {
 
         // Constants
-        MARIADB("jdbc:mariadb://%s:%d/%s"),
-        MYSQL("jdbc:mysql://%s:%d/%s"),
-        POSTGRESQL("jdbc:postgresql://%s:%d/%s");
+        MARIADB("jdbc:mariadb://%s:%d/%s", "org.mariadb.jdbc.Driver"),
+        MYSQL("jdbc:mysql://%s:%d/%s", "com.mysql.cj.jdbc.Driver"),
+        POSTGRESQL("jdbc:postgresql://%s:%d/%s", "org.postgresql.Driver");
 
+        // Attributes
         private final String urlPattern;
+        private final String classPath;
 
         /**
          * Constructs a DatabaseType with a specific URL pattern.
          *
          * @param urlPattern The JDBC URL pattern.
          */
-        DatabaseType(String urlPattern) {
+        DatabaseType(String urlPattern, String classPath) {
+
+            // Set attributes
             this.urlPattern = urlPattern;
+            this.classPath = classPath;
+
+            // Register driver
+            try {
+                Class.forName(classPath);
+            } catch (ClassNotFoundException e) {
+                System.err.println(e.getMessage());
+            }
         }
 
         /**
@@ -171,6 +184,15 @@ public abstract class Driver {
          */
         public String getUrl(String host, int port, String database) {
             return String.format(this.urlPattern, host, port, database);
+        }
+
+        /**
+         * Registers the database driver.
+         *
+         * @throws ClassNotFoundException If the driver class is not found.
+         */
+        public void registerDriver() throws ClassNotFoundException {
+            Class.forName(classPath);
         }
     }
 }
