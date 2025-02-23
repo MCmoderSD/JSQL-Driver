@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 /**
  * Abstract class representing a universal database driver.
- * Supports multiple databases via the DatabaseType enum.
+ * Supports multiple databases via the {@link DatabaseType} enum.
  */
 @SuppressWarnings("ALL")
 public abstract class Driver {
@@ -101,6 +101,11 @@ public abstract class Driver {
         }
     }
 
+    /**
+     * Establishes a connection to the database.
+     *
+     * @return {@code true} if the connection was established successfully, otherwise {@code false}.
+     */
     public boolean connect() {
         try {
             if (isConnected()) return true;
@@ -150,6 +155,12 @@ public abstract class Driver {
         private final String urlPattern;
         private final String classPath;
 
+        /**
+         * Constructs a DatabaseType with a specific JDBC URL pattern and driver class.
+         *
+         * @param urlPattern The JDBC URL pattern.
+         * @param classPath The fully qualified name of the database driver class.
+         */
         DatabaseType(String urlPattern, String classPath) {
 
             // Set attributes
@@ -176,7 +187,13 @@ public abstract class Driver {
             return String.format(urlPattern, host, port, database);
         }
 
-        public Class registerDriver() throws ClassNotFoundException {
+        /**
+         * Registers the JDBC driver class.
+         *
+         * @return The loaded driver class.
+         * @throws ClassNotFoundException If the driver class cannot be found.
+         */
+        public Class<?> registerDriver() throws ClassNotFoundException {
             return Class.forName(classPath);
         }
     }
