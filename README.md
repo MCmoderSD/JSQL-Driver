@@ -7,7 +7,6 @@ A simple Java SQL driver for connecting to a SQL databases.
 
 ## Supported Databases
 - [x] MariaDB
-- [ ] Microsoft SQL Server (not tested)
 - [x] MySQL
 - [x] PostgreSQL
 
@@ -28,7 +27,7 @@ Add the dependency to your `pom.xml` file:
 <dependency>
     <groupId>com.github.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
 </dependency>
 ```
 

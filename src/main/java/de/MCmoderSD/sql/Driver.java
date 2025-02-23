@@ -146,10 +146,9 @@ public abstract class Driver {
     public enum DatabaseType {
 
         // Constants
-        MYSQL("jdbc:mysql://%s:%d/%s"),
-        POSTGRESQL("jdbc:postgresql://%s:%d/%s"),
         MARIADB("jdbc:mariadb://%s:%d/%s"),
-        SQLSERVER("jdbc:sqlserver://%s:%d;databaseName=%s");
+        MYSQL("jdbc:mysql://%s:%d/%s"),
+        POSTGRESQL("jdbc:postgresql://%s:%d/%s");
 
         private final String urlPattern;
 
