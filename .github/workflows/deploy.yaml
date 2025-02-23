@@ -107,9 +107,16 @@ jobs:
 
       - name: Get latest existing release tag
         run: |
-          TAG=$(git tag --sort=-creatordate | grep -v "${{ env.version }}" | head -n 1)
+          TAG=$(git tag --sort=-creatordate | grep -v "${{ env.version }}" | head -n 1 || true)
+          if [ -z "$TAG" ]; then
+            echo "No previous tag found."
+            CHANGELOG_URL="https://github.com/${{ github.repository }}/commits/${{ env.version }}"
+          else
+            echo "Previous tag: $TAG"
+            CHANGELOG_URL="https://github.com/${{ github.repository }}/compare/$TAG...${{ env.version }}"
+          fi
           echo "tag=$TAG" >> $GITHUB_ENV
-          echo "Previous tag: $TAG"
+          echo "changelog_url=$CHANGELOG_URL" >> $GITHUB_ENV
 
       - name: Calculate Hashes
         run: |
@@ -129,7 +136,7 @@ jobs:
           tag_name: ${{ env.version }}
           name: "${{ env.repository}} - Release ${{ env.version }}"
           body: |
-            **Full Changelog**: https://github.com/MCmoderSD/${{ env.repository }}/compare/${{ env.tag }}...${{ env.version }}
+            **Full Changelog**: ${{ env.changelog_url }}
 
             ## Checksums:
 
