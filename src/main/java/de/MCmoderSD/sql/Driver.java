@@ -1,6 +1,8 @@
 package de.MCmoderSD.sql;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.jetbrains.annotations.Nullable;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,12 +34,12 @@ public abstract class Driver {
      */
     public Driver(DatabaseType databaseType, JsonNode config) {
         this(
-                databaseType,                       // Database Type
-                config.get("host").asText(),        // Host
-                config.get("port").asInt(),         // Port
-                config.get("database").asText(),    // Database
-                config.get("username").asText(),    // Username
-                config.get("password").asText()     // Password
+                databaseType,                                                           // Database Type
+                config.has("host") ? config.get("host").asText() : null,            // Host
+                config.has("port") ? config.get("port").asInt() : null,             // Port
+                config.get("database").asText(),                                        // Database
+                config.has("username") ? config.get("username").asText() : null,    // Username
+                config.has("password") ? config.get("password").asText() : null     // Password
         );
     }
 
@@ -51,7 +53,7 @@ public abstract class Driver {
      * @param username The database username.
      * @param password The database password.
      */
-    public Driver(DatabaseType databaseType, String host, int port, String database, String username, String password) {
+    public Driver(DatabaseType databaseType, @Nullable String host, @Nullable Integer port, String database, @Nullable String username, @Nullable String password) {
 
         // Set attributes
         this.databaseType = databaseType;
@@ -62,25 +64,26 @@ public abstract class Driver {
         this.password = password;
 
         // Validate attributes and establish connection
-        checkAttributes(host, port, database, username, password);
+        checkAttributes(databaseType, host, port, database, username, password);
         url = databaseType.getUrl(host, port, database);
         connect();
     }
 
     /**
-     * Validates the provided connection attributes.
+     * Validates the connection attributes.
      *
+     * @param databaseType The type of database.
      * @param host The database host.
      * @param port The database port.
      * @param database The database name.
      * @param username The database username.
      * @param password The database password.
-     * @throws IllegalArgumentException If any parameter is invalid.
      */
-    private static void checkAttributes(String host, Integer port, String database, String username, String password) {
+    private static void checkAttributes(DatabaseType databaseType, @Nullable String host, @Nullable Integer port, String database, @Nullable String username, @Nullable String password) {
+        if (database == null || database.isBlank()) throw new IllegalArgumentException("Invalid database");
+        if (databaseType == DatabaseType.SQLITE) return; // SQLite does not require host and port
         if (host == null || host.isBlank()) throw new IllegalArgumentException("Invalid host");
         if (port == null || port <= 0 || port > 65535) throw new IllegalArgumentException("Invalid port");
-        if (database == null || database.isBlank()) throw new IllegalArgumentException("Invalid database");
         if (username == null || username.isBlank()) throw new IllegalArgumentException("Invalid username");
         if (password == null || password.isBlank()) throw new IllegalArgumentException("Invalid password");
     }
@@ -111,6 +114,40 @@ public abstract class Driver {
             if (isConnected()) return true;
             databaseType.registerDriver();
             connection = DriverManager.getConnection(url, username, password);
+
+            // Enable SQLite-specific features
+            if (databaseType == DatabaseType.SQLITE && connection != null) {
+                try (var stmt = connection.createStatement()) {
+                    stmt.execute("PRAGMA foreign_keys = ON;");
+                }
+            }
+
+            return connection != null && connection.isValid(0);
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println(e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Establishes a connection to the database with additional parameters.
+     *
+     * @param pragma Additional parameters for the connection.
+     * @return {@code true} if the connection was established successfully, otherwise {@code false}.
+     */
+    public boolean connect(String... pragma) {
+        try {
+            if (isConnected()) return true;
+            databaseType.registerDriver();
+            connection = DriverManager.getConnection(url, username, password);
+
+            // Enable SQLite-specific features
+            if (databaseType == DatabaseType.SQLITE && connection != null) {
+                try (var stmt = connection.createStatement()) {
+                    for (String p : pragma) stmt.execute(p);
+                }
+            }
+
             return connection != null && connection.isValid(0);
         } catch (SQLException | ClassNotFoundException e) {
             System.err.println(e.getMessage());
@@ -149,7 +186,8 @@ public abstract class Driver {
         // Constants
         MARIADB("jdbc:mariadb://%s:%d/%s", "org.mariadb.jdbc.Driver"),
         MYSQL("jdbc:mysql://%s:%d/%s", "com.mysql.cj.jdbc.Driver"),
-        POSTGRESQL("jdbc:postgresql://%s:%d/%s", "org.postgresql.Driver");
+        POSTGRESQL("jdbc:postgresql://%s:%d/%s", "org.postgresql.Driver"),
+        SQLITE("jdbc:sqlite:%s", "org.sqlite.JDBC");
 
         // Attributes
         private final String urlPattern;
@@ -183,7 +221,8 @@ public abstract class Driver {
          * @param database The database name.
          * @return The formatted JDBC URL.
          */
-        public String getUrl(String host, int port, String database) {
+        public String getUrl(@Nullable String host, @Nullable Integer port, String database) {
+            if (this == SQLITE) return String.format(urlPattern, database);
             return String.format(urlPattern, host, port, database);
         }
 

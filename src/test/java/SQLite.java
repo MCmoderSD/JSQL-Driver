@@ -1,12 +1,13 @@
 import de.MCmoderSD.sql.Driver;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Database extends Driver {
+public class SQLite extends Driver {
 
-    public Database(DatabaseType databaseType, String host, Integer port, String database, String username, String password) {
+    public SQLite(DatabaseType databaseType, @Nullable String host, @Nullable Integer port, String database, @Nullable String username, @Nullable String password) {
         super(databaseType, host, port, database, username, password);
     }
 
@@ -34,13 +35,13 @@ public class Database extends Driver {
     public static void main(String[] args) {
 
         // Initialize Database
-        Database database = new Database(
-                DatabaseType.MYSQL,     // Database Type
-                "localhost",            // Host
-                3306,                   // Port
-                "database",             // Database
-                "username",             // Username
-                "password"              // Password
+        SQLite database = new SQLite(
+                DatabaseType.SQLITE,    // Database Type
+                null,                   // Host
+                null,                   // Port
+                ":memory:",             // Database
+                null,                   // Username
+                null                    // Password
         );
 
         // Test Database
