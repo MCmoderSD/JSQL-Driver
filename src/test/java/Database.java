@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@SuppressWarnings("ALL")
 public class Database extends Driver {
 
     public Database(DatabaseType databaseType, String host, Integer port, String database, String username, String password) {

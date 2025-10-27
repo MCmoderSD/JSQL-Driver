@@ -27,7 +27,7 @@ Add the dependency to your `pom.xml` file:
 <dependency>
     <groupId>de.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>2.2.2</version>
+    <version>2.2.3</version>
 </dependency>
 ```
 
@@ -42,6 +42,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@SuppressWarnings("ALL")
 public class Database extends Driver {
 
     public Database(DatabaseType databaseType, String host, Integer port, String database, String username, String password) {
@@ -97,6 +98,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@SuppressWarnings("ALL")
 public class SQLite extends Driver {
 
     public SQLite(DatabaseType databaseType, @Nullable String host, @Nullable Integer port, String database, @Nullable String username, @Nullable String password) {

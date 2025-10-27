@@ -1,7 +1,7 @@
 package de.MCmoderSD.sql;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.jetbrains.annotations.Nullable;
+import tools.jackson.databind.JsonNode;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,12 +34,12 @@ public abstract class Driver {
      */
     public Driver(DatabaseType databaseType, JsonNode config) {
         this(
-                databaseType,                                                           // Database Type
-                config.has("host") ? config.get("host").asText() : null,            // Host
+                databaseType,                                                       // Database Type
+                config.has("host") ? config.get("host").asString() : null,          // Host
                 config.has("port") ? config.get("port").asInt() : null,             // Port
-                config.get("database").asText(),                                        // Database
-                config.has("username") ? config.get("username").asText() : null,    // Username
-                config.has("password") ? config.get("password").asText() : null     // Password
+                config.get("database").asString(),                                  // Database
+                config.has("username") ? config.get("username").asString() : null,  // Username
+                config.has("password") ? config.get("password").asString() : null   // Password
         );
     }
 
@@ -142,10 +142,8 @@ public abstract class Driver {
             connection = DriverManager.getConnection(url, username, password);
 
             // Enable SQLite-specific features
-            if (databaseType == DatabaseType.SQLITE && connection != null) {
-                try (var stmt = connection.createStatement()) {
-                    for (String p : pragma) stmt.execute(p);
-                }
+            if (databaseType == DatabaseType.SQLITE && connection != null) try (var stmt = connection.createStatement()) {
+                for (var p : pragma) stmt.execute(p);
             }
 
             return connection != null && connection.isValid(0);
@@ -221,7 +219,7 @@ public abstract class Driver {
          * @param database The database name.
          * @return The formatted JDBC URL.
          */
-        public String getUrl(@Nullable String host, @Nullable Integer port, String database) {
+        private String getUrl(@Nullable String host, @Nullable Integer port, String database) {
             if (this == SQLITE) return String.format(urlPattern, database);
             return String.format(urlPattern, host, port, database);
         }
@@ -232,7 +230,7 @@ public abstract class Driver {
          * @return The loaded driver class.
          * @throws ClassNotFoundException If the driver class cannot be found.
          */
-        public Class<?> registerDriver() throws ClassNotFoundException {
+        private Class<?> registerDriver() throws ClassNotFoundException {
             return Class.forName(classPath);
         }
     }
