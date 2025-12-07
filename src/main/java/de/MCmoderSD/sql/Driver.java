@@ -25,6 +25,7 @@ public abstract class Driver {
 
     // Attributes
     protected Connection connection;
+    protected boolean autoReconnect;
 
     /**
      * Constructs a Driver instance using a configuration JSON node.
@@ -89,6 +90,17 @@ public abstract class Driver {
     }
 
     /**
+     * Automatically reconnects to the database if the connection is lost.
+     * Starts a background thread that continuously monitors the connection
+     * and re-establishes it if necessary.
+     */
+    private void autoReconnect() {
+        new Thread(() -> {
+            while (autoReconnect) if (!isConnected()) connect();
+        }).start();
+    }
+
+    /**
      * Disconnects from the database.
      *
      * @return {@code true} if disconnected successfully, otherwise {@code false}.
@@ -96,6 +108,7 @@ public abstract class Driver {
     public boolean disconnect() {
         try {
             if (!isConnected()) return true;
+            autoReconnect = false;
             connection.close();
             return connection == null || connection.isClosed();
         } catch (SQLException e) {
@@ -151,6 +164,16 @@ public abstract class Driver {
             System.err.println(e.getMessage());
             return false;
         }
+    }
+
+    /**
+     * Sets the auto-reconnect flag and starts the auto-reconnect thread if enabled.
+     *
+     * @param autoReconnect {@code true} to enable automatic reconnection, {@code false} to disable it.
+     */
+    public void setAutoReconnect(boolean autoReconnect) {
+        this.autoReconnect = autoReconnect;
+        if (autoReconnect) autoReconnect();
     }
 
     /**
