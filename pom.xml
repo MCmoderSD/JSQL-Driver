@@ -6,7 +6,7 @@
 
     <groupId>de.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
 
     <name>JSQL-Driver</name>
     <description>A simple Java SQL driver for connecting to a SQL databases</description>
@@ -26,13 +26,6 @@
     </properties>
 
     <dependencies>
-
-        <!-- JSON -->
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>3.0.4</version>
-        </dependency>
 
         <!-- MariaDB -->
         <dependency>
@@ -60,13 +53,6 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.51.1.0</version>
-        </dependency>
-
-        <!-- Annotations -->
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>26.0.2-1</version>
         </dependency>
 
     </dependencies>
