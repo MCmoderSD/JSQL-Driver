@@ -27,7 +27,7 @@ Add the dependency to your `pom.xml` file:
 <dependency>
     <groupId>de.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>2.2.4</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
@@ -45,8 +45,8 @@ import java.sql.SQLException;
 @SuppressWarnings("ALL")
 public class Database extends Driver {
 
-    public Database(DatabaseType databaseType, String host, Integer port, String database, String username, String password) {
-        super(databaseType, host, port, database, username, password);
+    public Database(Driver.Builder builder) {
+        super(builder);
     }
 
     public Integer getRowCount() {
@@ -70,21 +70,26 @@ public class Database extends Driver {
         return null;
     }
 
-    public static void main(String[] args) {
+    static void main() {
 
-        // Initialize Database
-        Database database = new Database(
-                DatabaseType.MYSQL,     // Database Type
-                "localhost",            // Host
-                3306,                   // Port
-                "database",             // Database
-                "username",             // Username
-                "password"              // Password
-        );
+        // Build Driver
+        Driver.Builder builder = Driver.Builder // Create Builder
+                .withType(DatabaseType.MARIADB) // Database Type
+                .withHost("localhost")          // Host
+                .withPort(3306)                 // Port
+                .withDatabase("database")       // Database
+                .withUsername("username")       // Username
+                .withPassword("password");      // Password
+
+        // Initialize Database Connection
+        Database database = new Database(builder);
+        database.setAutoReconnectSettings(5, 10000);    // Auto Reconnect Settings (5 Attempts, 10s Delay)
+        database.setAutoReconnect(true);                // Enable Auto Reconnect
+        database.connect();                             // Connect to Database
 
         // Test Database
-        System.out.println("Connected: " + database.isConnected());
-        System.out.println("Row Count: " + database.getRowCount());
+        IO.println("Connected: " + database.isConnected());
+        IO.println("Row Count: " + database.getRowCount());
     }
 }
 ```
@@ -92,7 +97,6 @@ public class Database extends Driver {
 ### SQLite
 ```java
 import de.MCmoderSD.sql.Driver;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -101,8 +105,8 @@ import java.sql.SQLException;
 @SuppressWarnings("ALL")
 public class SQLite extends Driver {
 
-    public SQLite(DatabaseType databaseType, @Nullable String host, @Nullable Integer port, String database, @Nullable String username, @Nullable String password) {
-        super(databaseType, host, port, database, username, password);
+    public SQLite(Builder builder) {
+        super(builder);
     }
 
     public Integer getRowCount() {
@@ -126,21 +130,20 @@ public class SQLite extends Driver {
         return null;
     }
 
-    public static void main(String[] args) {
+    static void main() {
 
-        // Initialize Database
-        SQLite database = new SQLite(
-                DatabaseType.SQLITE,    // Database Type
-                null,                   // Host
-                null,                   // Port
-                ":memory:",             // Database
-                null,                   // Username
-                null                    // Password
-        );
+        // Build Driver
+        Builder builder = Driver.Builder
+                .withType(DatabaseType.SQLITE)  // Database Type
+                .withDatabase("Database.db");   // Database File
+
+        // Initialize Database Connection
+        SQLite database = new SQLite(builder);
+        database.connect();
 
         // Test Database
-        System.out.println("Connected: " + database.isConnected());
-        System.out.println("Row Count: " + database.getRowCount());
+        IO.println("Connected: " + database.isConnected());
+        IO.println("Row Count: " + database.getRowCount());
     }
 }
 ```
