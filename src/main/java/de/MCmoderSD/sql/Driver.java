@@ -4,6 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Abstract base class for SQL database drivers.
+ * <p>
+ * This class manages a JDBC {@link Connection}, supports multiple database
+ * types via {@link DatabaseType}, and optionally provides automatic
+ * reconnection handling.
+ * </p>
+ *
+ * <p>
+ * Instances must be created using the {@link Builder}.
+ * </p>
+ */
 @SuppressWarnings({"unused", "UnusedReturnValue", "BusyWait"})
 public abstract class Driver {
 
@@ -25,7 +37,12 @@ public abstract class Driver {
     protected int reconnectAttempts;   // Default: 0 (infinite)
     protected long reconnectDelay;     // Default: 1000ms
 
-    // Constructor
+    /**
+     * Constructs a new database driver using the given builder.
+     *
+     * @param builder the builder containing configuration values
+     * @throws IllegalArgumentException if the builder is {@code null}
+     */
     protected Driver(Builder builder) {
 
         // Check Builder
@@ -49,6 +66,10 @@ public abstract class Driver {
         reconnectDelay = 1000;
     }
 
+    /**
+     * Starts a background thread that automatically attempts to reconnect
+     * if the connection is lost.
+     */
     private void autoReconnect() {
 
         // Create the thread
@@ -76,6 +97,11 @@ public abstract class Driver {
         reconnectThread.start();
     }
 
+    /**
+     * Establishes a database connection.
+     *
+     * @return {@code true} if the connection is successfully established
+     */
     public boolean connect() {
         try {
             if (isConnected()) return true;
@@ -96,6 +122,11 @@ public abstract class Driver {
         }
     }
 
+    /**
+     * Closes the database connection.
+     *
+     * @return {@code true} if the connection is closed or was already closed
+     */
     public boolean disconnect() {
         try {
             if (!isConnected()) return true;
@@ -107,16 +138,32 @@ public abstract class Driver {
         }
     }
 
+    /**
+     * Enables or disables automatic reconnection.
+     *
+     * @param autoReconnect {@code true} to enable auto-reconnect
+     */
     public void setAutoReconnect(boolean autoReconnect) {
         this.autoReconnect = autoReconnect;
         if (autoReconnect) autoReconnect();
     }
 
+    /**
+     * Configures automatic reconnection behavior.
+     *
+     * @param attempts maximum reconnect attempts (0 = infinite)
+     * @param delay delay between attempts in milliseconds
+     */
     public void setAutoReconnectSettings(int attempts, long delay) {
         this.reconnectAttempts = attempts;
         this.reconnectDelay = delay;
     }
 
+    /**
+     * Checks whether the database connection is currently valid.
+     *
+     * @return {@code true} if connected and valid
+     */
     public boolean isConnected() {
         try {
             return connection != null && connection.isValid(0);
@@ -126,6 +173,11 @@ public abstract class Driver {
         }
     }
 
+    /**
+     * Returns the active JDBC connection.
+     *
+     * @return the {@link Connection}, or {@code null} if not connected
+     */
     public Connection getConnection() {
         return connection;
     }
@@ -143,7 +195,12 @@ public abstract class Driver {
         private final String urlPattern;
         private final String classPath;
 
-        // Constructor
+        /**
+         * Creates a new database type.
+         *
+         * @param urlPattern JDBC URL pattern
+         * @param classPath JDBC driver class path
+         */
         DatabaseType(String urlPattern, String classPath) {
 
             // Set attributes
@@ -158,22 +215,35 @@ public abstract class Driver {
             }
         }
 
-        // Driver Registration
+        /**
+         * Registers the JDBC driver class.
+         *
+         * @return the loaded driver class
+         * @throws ClassNotFoundException if the driver cannot be found
+         */
         private Class<?> registerDriver() throws ClassNotFoundException {
             return Class.forName(classPath);
         }
 
-        // Get URL Methods
+
+        /**
+         * Builds a JDBC URL for server-based databases.
+         */
         private String getUrl(String host, Integer port, String database) {
             return String.format(urlPattern, host, port, database);
         }
 
+        /**
+         * Builds a JDBC URL for SQLite databases.
+         */
         private String getUrl(String database) {
             return String.format(urlPattern, database);
         }
     }
 
-    // Builder Class
+    /**
+     * Builder for creating {@link Driver} instances.
+     */
     public static class Builder {
 
         // Attributes
@@ -189,12 +259,22 @@ public abstract class Driver {
             this.databaseType = databaseType;
         }
 
-        // Initialize Builder
+        /**
+         * Creates a new builder for the given database type.
+         *
+         * @param databaseType the database type
+         * @return a new builder instance
+         */
         public static Builder withType(DatabaseType databaseType) {
             return new Builder(databaseType);
         }
 
-        // Builder Methods
+        /**
+         * Sets the database host.
+         *
+         * @param host database host
+         * @return this builder
+         */
         public Builder withHost(String host) {
             if (databaseType == DatabaseType.SQLITE) throw new IllegalArgumentException("Host is not required for SQLite databases");
             if (host == null || host.isBlank()) throw new IllegalArgumentException("Host cannot be null or blank");
@@ -202,6 +282,12 @@ public abstract class Driver {
             return this;
         }
 
+        /**
+         * Sets the database port.
+         *
+         * @param port database port
+         * @return this builder
+         */
         public Builder withPort(Integer port) {
             if (databaseType == DatabaseType.SQLITE) throw new IllegalArgumentException("Port is not required for SQLite databases");
             if (port == null || port < 1 || port > 65535) throw new IllegalArgumentException("Port must be between 1 and 65535");
@@ -209,12 +295,24 @@ public abstract class Driver {
             return this;
         }
 
+        /**
+         * Sets the database name or SQLite file path.
+         *
+         * @param database database name
+         * @return this builder
+         */
         public Builder withDatabase(String database) {
             if (database == null || database.isBlank()) throw new IllegalArgumentException("Database cannot be null or blank");
             this.database = database;
             return this;
         }
 
+        /**
+         * Sets the database username.
+         *
+         * @param username database username
+         * @return this builder
+         */
         public Builder withUsername(String username) {
             if (databaseType == DatabaseType.SQLITE) throw new IllegalArgumentException("Username is not required for SQLite databases");
             if (username == null || username.isBlank()) throw new IllegalArgumentException("Username cannot be null or blank");
@@ -222,6 +320,12 @@ public abstract class Driver {
             return this;
         }
 
+        /**
+         * Sets the database password.
+         *
+         * @param password database password
+         * @return this builder
+         */
         public Builder withPassword(String password) {
             if (databaseType == DatabaseType.SQLITE) throw new IllegalArgumentException("Password is not required for SQLite databases");
             if (password == null || password.isBlank()) throw new IllegalArgumentException("Password cannot be null or blank");
