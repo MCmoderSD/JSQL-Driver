@@ -34,8 +34,8 @@ public class SQLite extends Driver {
 
     static void main() {
 
-        // Build Driver
-        Builder builder = Driver.Builder
+        // Build SQLite Configuration
+        SQLite.Builder builder = SQLite.Builder
                 .withType(DatabaseType.SQLITE)  // Database Type
                 .withDatabase("Database.db");   // Database File
 

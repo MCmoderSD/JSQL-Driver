@@ -73,13 +73,13 @@ public class Database extends Driver {
     static void main() {
 
         // Build Driver
-        Driver.Builder builder = Driver.Builder // Create Builder
-                .withType(DatabaseType.MARIADB) // Database Type
-                .withHost("localhost")          // Host
-                .withPort(3306)                 // Port
-                .withDatabase("database")       // Database
-                .withUsername("username")       // Username
-                .withPassword("password");      // Password
+        Database.Builder builder = Database.Builder // Create Builder
+                .withType(DatabaseType.MARIADB)     // Database Type
+                .withHost("localhost")              // Host
+                .withPort(3306)                     // Port
+                .withDatabase("database")           // Database
+                .withUsername("username")           // Username
+                .withPassword("password");          // Password
 
         // Initialize Database Connection
         Database database = new Database(builder);
@@ -132,8 +132,8 @@ public class SQLite extends Driver {
 
     static void main() {
 
-        // Build Driver
-        Builder builder = Driver.Builder
+        // Build SQLite Configuration
+        SQLite.Builder builder = SQLite.Builder
                 .withType(DatabaseType.SQLITE)  // Database Type
                 .withDatabase("Database.db");   // Database File
 
