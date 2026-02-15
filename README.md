@@ -27,7 +27,7 @@ Add the dependency to your `pom.xml` file:
 <dependency>
     <groupId>de.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>3.0.1</version>
+    <version>3.1.0</version>
 </dependency>
 ```
 
@@ -36,19 +36,46 @@ Add the dependency to your `pom.xml` file:
 
 ### MySQL/MariaDB/PostgreSQL
 ```java
+import de.MCmoderSD.sql.Driver.Builder;
 import de.MCmoderSD.sql.Driver;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
-@SuppressWarnings("ALL")
-public class Database extends Driver {
+import static de.MCmoderSD.sql.Driver.DatabaseType.MARIADB;
 
-    public Database(Driver.Builder builder) {
-        super(builder);
+void main() {
+
+    // Build Database Configuration
+    Builder builder = Database.builder()    // Create Builder
+            .withType(MARIADB)              // Database Type
+            .withHost("localhost")          // Host
+            .withPort(3306)                 // Port
+            .withDatabase("database")       // Database
+            .withUsername("username")       // Username
+            .withPassword("password");      // Password
+
+    // Initialize Database Connection
+    Database database = new Database(builder);
+    database.setAutoReconnectSettings(5, 10000);    // Auto Reconnect Settings (5 Attempts, 10s Delay)
+    database.setAutoReconnect(true);                // Enable Auto Reconnect
+    database.connect();                             // Connect to Database
+
+    // Test Database
+    IO.println("Connected: " + database.isConnected());
+    IO.println("Row Count: " + database.getRowCount());
+}
+
+// Database Driver Implementation
+private static class Database extends Driver {
+
+    // Constructor
+    public Database(Builder builder) {
+        super(builder); // Initialize Driver
     }
 
+    // Get Row Count Method
     public Integer getRowCount() {
 
         // Initialize SQL Query
@@ -68,47 +95,46 @@ public class Database extends Driver {
         }
 
         return null;
-    }
-
-    static void main() {
-
-        // Build Driver
-        Database.Builder builder = Database.Builder // Create Builder
-                .withType(DatabaseType.MARIADB)     // Database Type
-                .withHost("localhost")              // Host
-                .withPort(3306)                     // Port
-                .withDatabase("database")           // Database
-                .withUsername("username")           // Username
-                .withPassword("password");          // Password
-
-        // Initialize Database Connection
-        Database database = new Database(builder);
-        database.setAutoReconnectSettings(5, 10000);    // Auto Reconnect Settings (5 Attempts, 10s Delay)
-        database.setAutoReconnect(true);                // Enable Auto Reconnect
-        database.connect();                             // Connect to Database
-
-        // Test Database
-        IO.println("Connected: " + database.isConnected());
-        IO.println("Row Count: " + database.getRowCount());
     }
 }
 ```
 
 ### SQLite
 ```java
+import de.MCmoderSD.sql.Driver.Builder;
 import de.MCmoderSD.sql.Driver;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
-@SuppressWarnings("ALL")
-public class SQLite extends Driver {
+import static de.MCmoderSD.sql.Driver.DatabaseType.SQLITE;
 
+void main() {
+
+    // Build SQLite Configuration
+    Builder builder = SQLite.builder()
+            .withType(SQLITE)               // Database Type
+            .withDatabase("Database.db");   // Database File
+
+    // Initialize Database Connection
+    SQLite database = new SQLite(builder);
+    database.connect();
+
+    // Test Database
+    IO.println("Connected: " + database.isConnected());
+    IO.println("Row Count: " + database.getRowCount());
+}
+
+// SQLite Driver Implementation
+private static class SQLite extends Driver {
+
+    // Constructor
     public SQLite(Builder builder) {
-        super(builder);
+        super(builder); // Initialize Driver
     }
 
+    // Get Row Count Method
     public Integer getRowCount() {
 
         // Initialize SQL Query
@@ -128,22 +154,6 @@ public class SQLite extends Driver {
         }
 
         return null;
-    }
-
-    static void main() {
-
-        // Build SQLite Configuration
-        SQLite.Builder builder = SQLite.Builder
-                .withType(DatabaseType.SQLITE)  // Database Type
-                .withDatabase("Database.db");   // Database File
-
-        // Initialize Database Connection
-        SQLite database = new SQLite(builder);
-        database.connect();
-
-        // Test Database
-        IO.println("Connected: " + database.isConnected());
-        IO.println("Row Count: " + database.getRowCount());
     }
 }
 ```

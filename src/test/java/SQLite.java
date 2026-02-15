@@ -1,16 +1,37 @@
+import de.MCmoderSD.sql.Driver.Builder;
 import de.MCmoderSD.sql.Driver;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
-@SuppressWarnings("ALL")
-public class SQLite extends Driver {
+import static de.MCmoderSD.sql.Driver.DatabaseType.SQLITE;
 
+void main() {
+
+    // Build SQLite Configuration
+    Builder builder = SQLite.builder()
+            .withType(SQLITE)               // Database Type
+            .withDatabase("Database.db");   // Database File
+
+    // Initialize Database Connection
+    SQLite database = new SQLite(builder);
+    database.connect();
+
+    // Test Database
+    IO.println("Connected: " + database.isConnected());
+    IO.println("Row Count: " + database.getRowCount());
+}
+
+// SQLite Driver Implementation
+private static class SQLite extends Driver {
+
+    // Constructor
     public SQLite(Builder builder) {
-        super(builder);
+        super(builder); // Initialize Driver
     }
 
+    // Get Row Count Method
     public Integer getRowCount() {
 
         // Initialize SQL Query
@@ -30,21 +51,5 @@ public class SQLite extends Driver {
         }
 
         return null;
-    }
-
-    static void main() {
-
-        // Build SQLite Configuration
-        SQLite.Builder builder = SQLite.Builder
-                .withType(DatabaseType.SQLITE)  // Database Type
-                .withDatabase("Database.db");   // Database File
-
-        // Initialize Database Connection
-        SQLite database = new SQLite(builder);
-        database.connect();
-
-        // Test Database
-        IO.println("Connected: " + database.isConnected());
-        IO.println("Row Count: " + database.getRowCount());
     }
 }
