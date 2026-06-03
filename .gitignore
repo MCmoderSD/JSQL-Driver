@@ -4,9 +4,6 @@
 *.iml
 *.ipr
 
-### Docs ###
-docs/java/
-
 ### Output ###
 out/artifacts/
 
