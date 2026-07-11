@@ -6,7 +6,7 @@
 
     <groupId>de.MCmoderSD</groupId>
     <artifactId>JSQL-Driver</artifactId>
-    <version>3.1.2</version>
+    <version>3.1.3</version>
 
     <name>JSQL-Driver</name>
     <description>A simple Java SQL driver for connecting to a SQL databases</description>
@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.11</version>
+            <version>42.7.13</version>
         </dependency>
 
         <!-- SQLite -->
