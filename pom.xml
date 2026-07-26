@@ -10,6 +10,21 @@
 
     <name>JSQL-Driver</name>
     <description>A simple Java SQL driver for connecting to a SQL databases</description>
+    <url>https://github.com/MCmoderSD/JSQL-Driver</url>
+
+    <licenses>
+        <license>
+            <name>BSD 3-Clause License</name>
+            <url>https://github.com/MCmoderSD/JSQL-Driver/blob/master/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/MCmoderSD/JSQL-Driver</url>
+        <connection>scm:git:https://github.com/MCmoderSD/JSQL-Driver.git</connection>
+        <developerConnection>scm:git:https://github.com/MCmoderSD/JSQL-Driver.git</developerConnection>
+    </scm>
 
     <distributionManagement>
         <repository>
@@ -62,7 +77,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.2.1</version> <!-- don't change this -->
+                <version>3.4.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
